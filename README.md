@@ -1,2 +1,3 @@
 # akka-stream-kafka-getting-started
-Getting started with akka-stream-kafka code examples
+
+Code examples for blog article [Getting started with Akka Stream Kafka – Using Kafka the reactive streams way](https://vanwilgenburg.wordpress.com/2016/09/19/getting-started-with-akka-stream-kafka/)
