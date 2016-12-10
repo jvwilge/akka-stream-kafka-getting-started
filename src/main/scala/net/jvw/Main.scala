@@ -14,32 +14,29 @@ import org.apache.kafka.common.serialization.{ByteArrayDeserializer, StringDeser
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-object Main {
+object Main extends App {
 
-  def main(args: Array[String]): Unit = {
+  val config = ConfigFactory.load()
+  implicit val system = ActorSystem.create("akka-stream-kafka-getting-started", config)
+  implicit val mat = ActorMaterializer()
 
-    val config = ConfigFactory.load()
-    implicit val system = ActorSystem.create("akka-stream-kafka-getting-started", config)
-    implicit val mat = ActorMaterializer()
-
-    val consumerSettings = ConsumerSettings(system, new ByteArrayDeserializer, new StringDeserializer)
+  val consumerSettings = ConsumerSettings(system, new ByteArrayDeserializer, new StringDeserializer)
       .withBootstrapServers("localhost:9092")
-      .withGroupId("jeroen-akka-stream-kafka-test")
-      .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
+    .withGroupId("jeroen-akka-stream-kafka-test")
+    .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
 
-    Consumer.committableSource(consumerSettings, Subscriptions.topics("YadaYadaTopic"))
-      .map(msg => {
-        println(msg)
-      })
-      .runWith(Sink.ignore)
+  Consumer.committableSource(consumerSettings, Subscriptions.topics("YadaYadaTopic"))
+    .map(msg => {
+      println(msg)
+    })
+    .runWith(Sink.ignore)
 
-    // prevent WakeupException on quick restarts of vm
-    scala.sys.addShutdownHook {
-      println("Terminating... - " + Instant.now)
-      system.terminate()
-      Await.result(system.whenTerminated, 30 seconds)
-      println("Terminated... Bye - " + Instant.now)
-    }
+  // prevent WakeupException on quick restarts of vm
+  scala.sys.addShutdownHook {
+    println("Terminating... - " + Instant.now)
+    system.terminate()
+    Await.result(system.whenTerminated, 30 seconds)
+    println("Terminated... Bye - " + Instant.now)
   }
 
 }
